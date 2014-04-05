@@ -1,7 +1,6 @@
 #include <pebble.h>
 #include <PDUtils.h>
-#include "pebble.h"
-//#include <xprintf.h>	
+#include "pebble.h"	
 	
 Window *window;
 TextLayer *text_layer_time_left;
@@ -97,21 +96,192 @@ void day_type(){
 
 void get_period(){
 		
-	int now;
-	time_t time_left;
-	now = time_seconds();
-	time_t time_end = 0;
-	day_type();
-	struct tm *time_end_formatted;
-	char *time_format="%R";
-	if(strcmp(dayType,"w")==0){
-		
+	time_t now; //current time
+	time_t time_left; //time until end of period
+	time_t time_end = 0; //time of end of period
+	struct tm *time_left_formatted;//Struct for time left
+	char *time_format="%R"; //Deafult value for time left format
+	
+	now = time_seconds();//get current time
+	day_type();//populate dayType with current day type
+	
+	
+	if(strcmp(dayType,"w")==0){//Is dayType a weekend?
 		period="None!";
 		time_end=0;
 		textUntil=" ";
 	}
 	
+	if(strcmp(dayType,"1")==0){//Is dayType a Wednesday Block Day?
+		
+		//Start and End times of each period for wed block day converted to seconds since 12:00AM
+		int first_start = 29100;
+		int first_end = 34500;
+		int thrid_start = 34800;
+		int third_end = 40500;
+		int lunch_start = 40800;
+		int lunch_end = 43800;
+		int fifth_start = 44100;
+		int fifth_end = 49500;
+		int seventh_start = 49800;
+		int seventh_end = 55200;
+		
+		if (comp_time(00000,now,first_start))
+		{
+			period="Out";
+			time_end=first_start;
+			textUntil="To School";
+		}
+		if (comp_time(first_start,now,first_end))
+		{
+			period="1st";
+			time_end=first_end;
+			textUntil="Until End:";
+		}
+		if (comp_time(first_end,now,thrid_start))
+		{
+			period="Pass";
+			time_end=thrid_start;
+			textUntil="Until 2nd:";
+		}
+		if (comp_time(thrid_start,now,third_end))
+		{
+			period="3rd";
+			time_end=third_end;
+			textUntil="Until End:";
+		}
+		if (comp_time(third_end,now,lunch_start))
+		{
+			period="Pass";
+			time_end=lunch_start;
+			textUntil="Until Lunch:";
+		}
+		if (comp_time(lunch_start,now,lunch_end))
+		{
+			period="Lunch";
+			time_end=lunch_end;
+			textUntil="Until End:";
+		}
+		
+		if (comp_time(lunch_end,now,fifth_start))
+		{
+			period="Pass";
+			time_end=fifth_start;
+			textUntil="Until 5th:";
+		}
+		if (comp_time(fifth_start,now,fifth_end))
+		{
+			period="5th";
+			time_end=fifth_end;
+			textUntil="Until End:";
+		}
+		if (comp_time(fifth_end,now,seventh_start))
+		{
+			period="Pass";
+			time_end=seventh_start;
+			textUntil="Until 5th:";
+		}
+		if (comp_time(seventh_start,now,seventh_end))
+		{
+			period="7th";
+			time_end=seventh_end;
+			textUntil="Until End:";
+		}
+		
+		if (comp_time(seventh_end,now,86340))
+		{
+			period="Out";
+			time_end=0;
+			textUntil="Sleep";
+		}
+	}
+	
+	if(strcmp(dayType,"2")==0){//Is dayType a Thursday Block Day?
+		
+		//Start and End times of each period for thurs block day converted to seconds since 12:00AM
+		int second_start = 29100;
+		int second_end = 34500;
+		int fourth_start = 34800;
+		int fourth_end = 40500;
+		int lunch_start = 40800;
+		int lunch_end = 43800;
+		int sixth_start = 44100;
+		int sixth_end = 49500;
+		int eighth_start = 49800;
+		int eighth_end = 55200;
+		
+		if (comp_time(00000,now,second_start))
+		{
+			period="Out";
+			time_end=second_start;
+			textUntil="To School";
+		}
+		if (comp_time(second_start,now,second_end))
+		{
+			period="2nd";
+			time_end=second_end;
+			textUntil="Until End:";
+		}
+		if (comp_time(second_end,now,fourth_start))
+		{
+			period="Pass";
+			time_end=fourth_start;
+			textUntil="Until 2nd:";
+		}
+		if (comp_time(fourth_start,now,fourth_end))
+		{
+			period="4th";
+			time_end=fourth_end;
+			textUntil="Until End:";
+		}
+		if (comp_time(fourth_end,now,lunch_start))
+		{
+			period="Pass";
+			time_end=lunch_start;
+			textUntil="Until Lunch:";
+		}
+		if (comp_time(lunch_start,now,lunch_end))
+		{
+			period="Lunch";
+			time_end=lunch_end;
+			textUntil="Until End:";
+		}
+		
+		if (comp_time(lunch_end,now,sixth_start))
+		{
+			period="Pass";
+			time_end=sixth_start;
+			textUntil="Until 5th:";
+		}
+		if (comp_time(sixth_start,now,sixth_end))
+		{
+			period="6th";
+			time_end=sixth_end;
+			textUntil="Until End:";
+		}
+		if (comp_time(sixth_end,now,eighth_start))
+		{
+			period="Pass";
+			time_end=eighth_start;
+			textUntil="Until 5th:";
+		}
+		if (comp_time(eighth_start,now,eighth_end))
+		{
+			period="8th";
+			time_end=eighth_end;
+			textUntil="Until End:";
+		}
+		
+		if (comp_time(eighth_end,now,86340))
+		{
+			period="Out";
+			time_end=0;
+			textUntil="Sleep";
+		}
+	}
+	
 	if(strcmp(dayType,"n")==0){	//Is dayType a normal day?
+		
 		//Start and End times of each period for normal day converted to seconds since 12:00AM
 		int first_start = 29100;
 		int first_end = 32100;
@@ -130,6 +300,13 @@ void get_period(){
 		int eighth_start = 52200;
 		int eighth_end = 55200;
 		
+		
+		if (comp_time(00000,now,first_start))
+		{
+			period="Out";
+			time_end=first_start;
+			textUntil="To School";
+		}
 		if (comp_time(first_start,now,first_end))
 		{
 			period="1st";
@@ -138,7 +315,7 @@ void get_period(){
 		}
 		if (comp_time(first_end,now,second_start))
 		{
-			period="Pass 1";
+			period="Pass";
 			time_end=second_start;
 			textUntil="Until 2nd:";
 		}
@@ -150,7 +327,7 @@ void get_period(){
 		}
 		if (comp_time(second_end,now,thrid_start))
 		{
-			period="Pass 2";
+			period="Pass";
 			time_end=thrid_start;
 			textUntil="Until 3rd:";
 		}
@@ -163,7 +340,7 @@ void get_period(){
 		
 		if (comp_time(third_end,now,fourth_start))
 		{
-			period="Pass 3";
+			period="Pass";
 			time_end=fourth_start;
 			textUntil="Until 4th:";
 		}
@@ -175,7 +352,7 @@ void get_period(){
 		}
 		if (comp_time(fourth_end,now,fifth_start))
 		{
-			period="Pass 4";
+			period="Pass";
 			time_end=fifth_start;
 			textUntil="Until 5th:";
 		}
@@ -187,7 +364,7 @@ void get_period(){
 		}
 		if (comp_time(fifth_end,now,sixth_start))
 		{
-			period="Pass 5";
+			period="Pass";
 			time_end=sixth_start;
 			textUntil="Until 6th:";
 		}
@@ -199,7 +376,7 @@ void get_period(){
 		}
 		if (comp_time(sixth_end,now,seventh_start))
 		{
-			period="Pass 6";
+			period="Pass";
 			time_end=seventh_start;
 			textUntil="Until 7th:";
 		}
@@ -211,7 +388,7 @@ void get_period(){
 		}
 		if (comp_time(seventh_end,now,eighth_start))
 		{
-			period="Pass 7";
+			period="Pass";
 			time_end=eighth_start;
 			textUntil="Until 8th:";
 		}
@@ -225,40 +402,38 @@ void get_period(){
 		if (comp_time(eighth_end,now,86340))
 		{
 			period="Out";
-			time_end=now;
+			time_end=0;
 			textUntil="Sleep";
 		}
-		if (comp_time(00000,now,first_start))
-		{
-			period="Out";
-			time_end=first_start;
-			textUntil="To School2";
-		}
-		
+
 	}
+	
+	
+	
 	if (time_end == 0)
 	{
 		time_left=0;
 	}
 	else
 	{
-		if (time_left>=3600)
+		if (time_left>=3600)//60 minutes or more display as HH:MM
 		{
 			time_format = "%R";
 		}
-		if(time_left<3600)
+		if(time_left<3600) //Less than 60 minutes display as MM:SS
 		{
 			time_format = "%M:%S";
 		}
-		time_left=time_end-now;
+		
+		time_left=time_end-now;//Time left is the difference btween time end and current time
 	}
 	
-	time_end_formatted = localtime(&time_left);
-	strftime(time_left_string, sizeof(time_left_string), time_format , time_end_formatted);
+	time_left_formatted = localtime(&time_left);//create struct with remaining time
+	strftime(time_left_string, sizeof(time_left_string), time_format , time_left_formatted);//format based on switch above
 
-	text_layer_set_text(text_layer_period, period);
-	text_layer_set_text(text_layer_time_left, time_left_string);
-	text_layer_set_text(text_layer_text_until, textUntil);
+	text_layer_set_text(text_layer_period, period);//Set "period" text layer
+	text_layer_set_text(text_layer_time_left, time_left_string);//Set "time left" text layer
+	text_layer_set_text(text_layer_text_until, textUntil);//Set "text until" text layer
 }
 
 void handle_init(void) {
