@@ -1,0 +1,18 @@
+{
+    "versionLabel": "1.0",
+    "uuid": "2b958bf3-28c3-42e6-95b2-55e42b98a998",
+    "appKeys": {},
+    "longName": "FHS Periods 2",
+    "versionCode": 1,
+    "capabilities": [
+        ""
+    ],
+    "shortName": "FHS Periods 2",
+    "companyName": "KKloepfer",
+    "watchapp": {
+        "watchface": true
+    },
+    "resources": {
+        "media": []
+    }
+}

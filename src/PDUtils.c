@@ -4,8 +4,8 @@
 
   This code is released to the public domain.
 */
-
-#include "pebble_os.h"
+#include <pebble.h>
+#include <ctype.h>
 
 /* scalar date routines    --    public domain by Ray Gardner
 ** These will work over the range 1-01-01 thru 14699-12-31
@@ -61,7 +61,7 @@ static void scalar_to_ymd (long scalar,
   return;
 }
 
-time_t pmktime (PblTm *timeptr) {
+time_t p_mktime (struct tm *timeptr) {
   time_t tt;
 
   if ((timeptr->tm_year < 70) || (timeptr->tm_year > 120)) {
@@ -78,57 +78,7 @@ time_t pmktime (PblTm *timeptr) {
   return tt;
 }
 
-/* dow - written by Paul Edwards, 1993-01-31 */
-/* Released to the Public Domain */
-/* This routine will work over the range 1-01-01 to 32767-12-31.
-   It assumes the current calendar system has always been in
-   place in that time.  If you pass 0 or negative years, then
-   it produces results on the assumption that there is a year
-   0.  It should always produce a value in the range of 0..6
-   if a valid month and day have been passed, no matter what
-   the year is.  However, it has not been tested for negative
-   years, because the results are meaningless anyway.  It is
-   mainly to stop people playing silly buggers and causing
-   the macro to crash on negative years. */
-
-#define dow(y,m,d) \
-  ((((((m)+9)%12+1)<<4)%27 + (d) + 1 + \
-  ((y)%400+400) + ((y)%400+400)/4 - ((y)%400+400)/100 + \
-  (((m)<=2) ? ( \
-  (((((y)%4)==0) && (((y)%100)!=0)) || (((y)%400)==0)) \
-  ? 5 : 6) : 0)) % 7)
-
-/*
-  Note: Pebble doesn't think about timezones. So we pass a time_t to
-  gmtime that's already been offset for the desired TZ, and get a PblTm
-  object back in that TZ. I don't know how seedy actual developers will
-  think that is.
-*/
-static PblTm tms;
-
-PblTm *pgmtime (const time_t *timer) {
-  unsigned yr, mo, da;
-  unsigned long secs, days;
-
-  days = *timer / (60L*60*24);
-  secs = *timer % (60L*60*24);
-  scalar_to_ymd(days + ymd_to_scalar(1970, 1, 1), &yr, &mo, &da);
-  tms.tm_year = yr - 1900;
-  tms.tm_mon = mo - 1;
-  tms.tm_mday = da;
-  tms.tm_yday = (int)(ymd_to_scalar(tms.tm_year + 1900, mo, da)
-                      - ymd_to_scalar(tms.tm_year + 1900, 1, 1));
-  tms.tm_wday = dow(tms.tm_year + 1900, mo, da);
-  tms.tm_isdst = -1;
-  tms.tm_sec = (int)(secs % 60);
-  secs /= 60;
-  tms.tm_min = (int)(secs % 60);
-  secs /= 60;
-  tms.tm_hour = (int)secs;
-  return &tms;
-}
-
-char *pstrtok(char *s1, const char *s2) {
+char *p_strtok(char *s1, const char *s2) {
   static char *old = NULL;
   char *p;
   size_t len;
@@ -147,4 +97,77 @@ char *pstrtok(char *s1, const char *s2) {
   *(p + len) = '\0';
   old = p + len + 1;
   return(p);
+}
+
+unsigned long int strtoul(const char *nptr, char **endptr, int base) {
+  unsigned long x = 0;
+  int undecided = 0;
+
+  if (base == 0) {
+    undecided = 1;
+  }
+  while (isspace((unsigned char)*nptr)) {
+    nptr++;
+  }
+  while (1) {
+    if (isdigit((unsigned char)*nptr)) {
+      if (base == 0) {
+	if (*nptr == '0') {
+	  base = 8;
+	} else {
+	  base = 10;
+	  undecided = 0;
+	}
+      }
+      x = x * base + (*nptr - '0');
+      nptr++;
+    } else if (isalpha((unsigned char)*nptr)) {
+      if ((*nptr == 'X') || (*nptr == 'x')) {
+	if ((base == 0) || ((base == 8) && undecided)) {
+	  base = 16;
+	  undecided = 0;
+	  nptr++;
+	} else if (base == 16) {
+	  /* hex values are allowed to have an optional 0x */
+	  nptr++;
+	} else {
+	  break;
+	}
+      } else if (base <= 10) {
+	break;
+      } else {
+	x = x * base + (toupper((unsigned char)*nptr) - 'A') + 10;
+	nptr++;
+      }
+    } else {
+      break;
+    }
+  }
+  if (endptr != NULL) {
+    *endptr = (char *)nptr;
+  }
+  return (x);
+}
+
+long int strtol(const char *nptr, char **endptr, int base) {
+  unsigned long y;
+  long x;
+  int neg = 0;
+
+  while (isspace((unsigned char)*nptr)) {
+    nptr++;
+  }
+  if (*nptr == '-') {
+    neg = 1;
+    nptr++;
+  } else if (*nptr == '+') {
+    nptr++;
+  }
+  y = strtoul(nptr, endptr, base);
+  if (neg) {
+    x = (long)-y;
+  } else {
+    x = (long)y;
+  }
+  return (x);
 }
