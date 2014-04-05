@@ -23,6 +23,7 @@ void line_layer_update_callback(Layer *layer, GContext* ctx) {
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 }
+
 int time_seconds (){
 	struct tm time_today;
 	
